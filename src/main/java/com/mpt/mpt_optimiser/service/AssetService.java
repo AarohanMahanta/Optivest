@@ -26,6 +26,22 @@ public class AssetService {
     }
 
     public Asset addAsset(Asset asset) {
-        return assetDAO .save(asset);
+        return assetDAO.save(asset);
+    }
+
+    public void deleteAsset(Long id) {
+        assetDAO.deleteById(id);
+    }
+
+    public void deleteAllAssets() {
+        assetDAO.deleteAll();
+    }
+
+    public Asset updateAsset(Long id, Asset asset) {
+        Asset currentAsset = assetDAO.findById(id).orElseThrow(() -> new RuntimeException("Asset not found with id " + id));
+        currentAsset.setTicker(asset.getTicker());
+        currentAsset.setExpectedReturn(asset.getExpectedReturn());
+        currentAsset.setVolatility(asset.getVolatility());
+        return assetDAO.save(currentAsset);
     }
 }

@@ -1,6 +1,5 @@
 package com.mpt.mpt_optimiser.controller;
 
-import com.mpt.mpt_optimiser.dao.AssetDAO;
 import com.mpt.mpt_optimiser.model.Asset;
 import com.mpt.mpt_optimiser.service.AssetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +32,22 @@ public class AssetController {
     public Asset addAsset(@RequestBody Asset asset) {
         return assetService.addAsset(asset);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteAsset(@PathVariable Long id) {
+        assetService.deleteAsset(id);
+    }
+
+    @DeleteMapping
+    public void deleteAllAssets() {
+        assetService.deleteAllAssets();
+    }
+
+    @PutMapping("/{id}")
+    public Asset updateAsset(@PathVariable Long id, @RequestBody Asset newAsset) {
+        return assetService.updateAsset(id, newAsset);
+    }
+
+
 
 }
