@@ -1,9 +1,6 @@
 package com.mpt.mpt_optimiser.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -15,4 +12,7 @@ public class Asset {
     private Long id;
 
     private String ticker;
+    private Double expectedReturn;  //mean return
+    private Double volatility;      //standard deviation
 }
+
