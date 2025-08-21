@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import yfinance as yf
+import numpy as np
 
 
 app = Flask(__name__)
@@ -22,3 +23,11 @@ def optimise():
     mean_returns = daily_returns.mean()
     #calculating the covariance between each pair of tickers
     covariance_matrix = daily_returns.cov()
+
+    #implementing a naive equal weights portfolio for temporary testing purposes
+    n = len(tickers)
+    weights = np.ones(n) / n #np array of size n eg. [1, 1, 1, ... 1] for equal weights and dividing every value by n
+
+    portfolio_return = np.dot(weights, mean_returns) * 252 #252 is number of trading days annually
+    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(covariance_matrix* 252, weights)))
+    sharpe_ratio = portfolio_return / portfolio_volatility if portfolio_volatility > 0 else 0
