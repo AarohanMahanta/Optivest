@@ -52,7 +52,7 @@ public class AssetController {
         return assetService.updateAsset(id, newAsset);
     }
 
-    @PostMapping("/optimise")
+    @GetMapping("/optimise")
     public PortfolioResult optimise() {
         return portfolioService.optimise();
     }
