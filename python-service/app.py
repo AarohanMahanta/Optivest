@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import yfinance as yf
 import numpy as np
 import pandas as pd
+from scipy.optimize import minimize
 
 app = Flask(__name__)
 
@@ -28,18 +29,36 @@ def optimise():
     daily_returns = adj_close.pct_change().dropna()  # Day to day percentage change in those prices
 
     # expected return expressed as arithmetic mean of historical daily daily_returns
-    mean_returns = daily_returns.mean()
+    mean_returns = daily_returns.mean() * 252 #(annualised)
 
     # calculating the covariance between each pair of tickers
-    covariance_matrix = daily_returns.cov()
+    covariance_matrix = daily_returns.cov()* 252 #(annualised)
 
     # implementing a naive equal weights portfolio for temporary testing purposes
     n = len(tickers)
-    weights = np.ones(n) / n  # np array of size n eg. [1, 1, 1, ... 1] for equal weights and dividing every value by n
 
-    # calculating portfolio return and volatility
-    portfolio_return = np.dot(weights, mean_returns) * 252  # 252 is number of trading days annually
-    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(covariance_matrix * 252, weights)))
+    def negative_sharpe(weights, mean_returns, covariance_matrix):
+        portfolio_return = np.dot(weights, mean_returns)
+        portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(covariance_matrix, weights)))
+        return -(portfolio_return / portfolio_volatility)
+
+    #sum of weights should be 1
+    constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+    bounds = tuple((0, 1) for _ in range(n))
+
+    #initially we assume that the optimisation includes equal weights
+    initial_prediction = np.ones(n) / n
+
+    #now optimise:
+    opt_result = minimize(negative_sharpe, initial_prediction,
+                          args=(mean_returns, covariance_matrix),
+                          method='SLSQP',
+                          bounds=bounds,
+                          constraints=constraints)
+
+    weights = opt_result.x
+    portfolio_return = np.dot(weights, mean_returns)
+    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(covariance_matrix, weights)))
     sharpe_ratio = portfolio_return / portfolio_volatility if portfolio_volatility > 0 else 0
 
     result = {
