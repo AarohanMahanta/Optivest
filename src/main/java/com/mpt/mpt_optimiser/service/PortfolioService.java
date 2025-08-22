@@ -16,6 +16,7 @@ public class PortfolioService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final AssetDAO assetDAO;
+    private static final String pythonUrl = "http://localhost:5000/optimise";
 
     @Autowired
     public PortfolioService(AssetDAO assetDAO) {
@@ -23,8 +24,16 @@ public class PortfolioService {
     }
 
     public PortfolioResult optimise() {
-        String pythonUrl = "http://localhost:5000/optimise";
         List<Asset> assets = assetDAO.findAll();
+        return getPortfolioResult(assets);
+    }
+
+    public PortfolioResult optimiseWithChosenAssets(List<Long> assetIds) {
+        List<Asset> assets = assetDAO.findAllById(assetIds);
+        return getPortfolioResult(assets);
+    }
+
+    private PortfolioResult getPortfolioResult(List<Asset> assets) {
         List<String> tickers = assets.stream()
                 .map(Asset::getTicker)
                 .toList();
