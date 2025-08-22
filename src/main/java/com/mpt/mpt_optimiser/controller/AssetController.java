@@ -57,6 +57,9 @@ public class AssetController {
         return portfolioService.optimise();
     }
 
-
+    @PostMapping("/optimise")
+    public PortfolioResult optimiseWithChosenAssets(@RequestBody List<Long> assetIds) {
+        return portfolioService.optimiseWithChosenAssets(assetIds);
+    }
 
 }
