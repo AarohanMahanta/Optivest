@@ -6,6 +6,16 @@ from scipy.optimize import minimize
 
 app = Flask(__name__)
 
+def clean_json(value):
+    if isinstance(value, float) and (np.isnan(value) or np.isinf(value)):
+        return None
+    if isinstance(value, list):
+        return [clean_json(v) for v in value]
+    if isinstance(value, dict):
+        return {k: clean_json(v) for k, v in value.items()}
+    return value
+
+
 @app.route('/optimise', methods=['POST'])
 def optimise():
     data = request.get_json()
@@ -70,7 +80,7 @@ def optimise():
         "period": period
     }
 
-    return jsonify(result)
+    return jsonify(clean_json(result))
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
