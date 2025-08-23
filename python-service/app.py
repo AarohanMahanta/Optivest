@@ -73,10 +73,10 @@ def optimise():
     sharpe_ratio = portfolio_return / portfolio_volatility if portfolio_volatility > 0 else 0
 
     result = {
-        "weights": {tickers[i]: float(weights[i]) for i in range(n)},
-        "expectedReturn": float(portfolio_return),
-        "volatility": float(portfolio_volatility),
-        "sharpeRatio": float(sharpe_ratio),
+        "weights": {tickers[i]: f"{weights[i] * 100:.2f}%" for i in range(n)},
+        "expectedReturn": f"{portfolio_return * 100:.2f}%",
+        "volatility": f"{portfolio_volatility * 100:.2f}%",
+        "sharpeRatio": round(sharpe_ratio, 2),
         "period": period
     }
 
