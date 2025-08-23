@@ -10,12 +10,13 @@ app = Flask(__name__)
 def optimise():
     data = request.get_json()
     tickers = data.get("tickers", [])
+    period = data.get("period", "1y") #1y is default period
 
     if not tickers:
         return jsonify({"error": "No tickers provided"}), 400
 
     # retrieving prices from yfinance
-    prices = yf.download(tickers, period="1y", group_by='ticker', auto_adjust=True)
+    prices = yf.download(tickers, period=period, group_by='ticker', auto_adjust=True)
     # Adjusted Close prices; better suited for return calculations compared to raw close prices
 
     # handling single vs multiple tickers
@@ -65,7 +66,8 @@ def optimise():
         "weights": {tickers[i]: float(weights[i]) for i in range(n)},
         "expectedReturn": float(portfolio_return),
         "volatility": float(portfolio_volatility),
-        "sharpeRatio": float(sharpe_ratio)
+        "sharpeRatio": float(sharpe_ratio),
+        "period": period
     }
 
     return jsonify(result)
