@@ -30,8 +30,14 @@ public class PortfolioService {
 
     public PortfolioResult optimiseWithChosenAssets(List<String> tickers, String period) {
         List<Asset> assets = assetDAO.findByTickerIn(tickers);
+
+        if (assets.isEmpty()) {
+            throw new IllegalArgumentException("No matching assets found in DB for tickers: " + tickers);
+        }
+
         return getPortfolioResult(assets, period);
     }
+
 
     private PortfolioResult getPortfolioResult(List<Asset> assets, String period) {
         List<String> tickers = assets.stream()
