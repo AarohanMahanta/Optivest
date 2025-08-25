@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.ListResourceBundle;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/assets")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AssetController {
 
     private final AssetService assetService;
@@ -57,9 +60,11 @@ public class AssetController {
         return portfolioService.optimise();
     }
 
-    @PostMapping("/optimise")
-    public PortfolioResult optimiseWithChosenAssets(@RequestBody List<Long> assetIds) {
-        return portfolioService.optimiseWithChosenAssets(assetIds);
+    @PostMapping("/optimise/chosen")
+    public PortfolioResult optimiseWithChosenAssets(@RequestBody Map<String, Object> request) {
+        List<String> tickers = (List<String>) request.get("tickers");
+        String period = (String) request.getOrDefault("period", "1y");
+        return portfolioService.optimiseWithChosenAssets(tickers, period);
     }
 
 }
