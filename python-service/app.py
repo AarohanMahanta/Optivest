@@ -6,16 +6,27 @@ from scipy.optimize import minimize
 
 app = Flask(__name__)
 
+def clean_json(value):
+    if isinstance(value, float) and (np.isnan(value) or np.isinf(value)):
+        return None
+    if isinstance(value, list):
+        return [clean_json(v) for v in value]
+    if isinstance(value, dict):
+        return {k: clean_json(v) for k, v in value.items()}
+    return value
+
+
 @app.route('/optimise', methods=['POST'])
 def optimise():
     data = request.get_json()
     tickers = data.get("tickers", [])
+    period = data.get("period", "1y") #1y is default period
 
     if not tickers:
         return jsonify({"error": "No tickers provided"}), 400
 
     # retrieving prices from yfinance
-    prices = yf.download(tickers, period="1y", group_by='ticker', auto_adjust=True)
+    prices = yf.download(tickers, period=period, group_by='ticker', auto_adjust=True)
     # Adjusted Close prices; better suited for return calculations compared to raw close prices
 
     # handling single vs multiple tickers
@@ -62,13 +73,14 @@ def optimise():
     sharpe_ratio = portfolio_return / portfolio_volatility if portfolio_volatility > 0 else 0
 
     result = {
-        "weights": {tickers[i]: float(weights[i]) for i in range(n)},
-        "expectedReturn": float(portfolio_return),
-        "volatility": float(portfolio_volatility),
-        "sharpeRatio": float(sharpe_ratio)
+        "weights": {tickers[i]: f"{weights[i] * 100:.2f}%" for i in range(n)},
+        "expectedReturn": f"{portfolio_return * 100:.2f}%",
+        "volatility": f"{portfolio_volatility * 100:.2f}%",
+        "sharpeRatio": round(sharpe_ratio, 2),
+        "period": period
     }
 
-    return jsonify(result)
+    return jsonify(clean_json(result))
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
