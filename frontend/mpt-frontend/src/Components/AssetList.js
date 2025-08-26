@@ -33,7 +33,7 @@ function AssetList({ onSelectionChange }) {
                 checked={!!selected.find(a => a.id === asset.id)}
                 onChange={() => toggleSelection(asset)}
               />
-              {asset.ticker} (Return: {asset.expectedReturn}, Volatility: {asset.volatility})
+              {asset.ticker} 
             </label>
           </li>
         ))}

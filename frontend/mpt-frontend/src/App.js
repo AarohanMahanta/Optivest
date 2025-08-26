@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import AddAssetForm from "./Components/AddAssetForm";
 import AssetList from "./Components/AssetList";
+import Header from "./Components/Header"
 
 function App() {
   const [selectedAssets, setSelectedAssets] = useState([]);
   const [result, setResult] = useState(null);
   const [period, setPeriod] = useState("1y");
-
+  
   const handleOptimise = async () => {
   try {
     const response = await fetch("http://localhost:8080/api/assets/optimise/chosen", {
@@ -31,9 +32,19 @@ function App() {
 
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>MPT Optimiser</h1>
-
+    <div>
+      <Header/>
+   <div style={{ display: "flex", padding: "20px" }}>
+    {/* Left panel */}
+    <div
+      className="left-panel"
+      style={{
+        backgroundColor: "#f0f0f0",
+        padding: "20px",
+        width: "300px", 
+        minHeight: "100vh",
+      }}
+    >
       {/* Step 1: Add asset */}
       <AddAssetForm onAssetAdded={() => window.location.reload()} />
 
@@ -55,10 +66,12 @@ function App() {
           Optimise
         </button>
       </div>
+            </div>
+
 
       {/* Show results */}
       {result && (
-        <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: "20px", padding: "20px" }}>
           <h3>Results</h3>
           <p>Expected Return: {result.expectedReturn}</p>
           <p>Volatility: {result.volatility}</p>
@@ -74,6 +87,7 @@ function App() {
           </ul>
         </div>
       )}
+    </div>
     </div>
   );
 }
