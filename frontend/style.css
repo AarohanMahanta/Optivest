@@ -1,0 +1,162 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Title */
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2rem;
+    color: #222;
+}
+
+/* Layout */
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+/* Left Panel (sidebar) */
+.left-panel {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Asset Section */
+.asset-container {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.asset-container h2 {
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.add-asset-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-asset-form input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.add-asset-form button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #0077cc;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-asset-form button:hover {
+    background-color: #005fa3;
+}
+
+/* Asset List */
+.asset-list {
+    margin-bottom: 20px;
+}
+
+.asset-list ul {
+    list-style: none;
+}
+
+.asset-list li {
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    transition: ease;
+}
+
+/* Period + Optimise */
+.optimise-selection {
+    margin-top: 20px;
+}
+
+.optimise-selection label {
+    margin-right: 10px;
+}
+
+.optimise-selection select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.optimise-selection button {
+    margin-left: 10px;
+    padding: 6px 12px;
+    border: none;
+    background-color: #28a745;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.optimise-selection button:hover {
+    background-color: #1f7d34;
+}
+
+/* Results Section */
+.results {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.results h2 {
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.results p {
+    margin-bottom: 10px;
+}
+
+.results ul {
+    list-style: none;
+}
+
+.results li {
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    background-color: #eef6ff;
+    border-radius: 6px;
+}
+
+.asset-list li.selected {
+    background-color: #0077cc;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}

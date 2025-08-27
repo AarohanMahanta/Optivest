@@ -12,7 +12,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") //Cross-origin requests from all endpoints in API allowed
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://127.0.0.1:5500")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
         };

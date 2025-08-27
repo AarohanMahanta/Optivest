@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MPT Optimiser</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="../images/logo.png">
+</head>
+
+<body>
+    <div class="container">
+        <h1>MPT - Optimiser</h1>
+
+        <div class="main-content">
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <aside class="asset-container">
+                    <h2>Assets</h2>
+                    <!-- Asset collection form -->
+                    <div class="add-asset-form">
+                        <label for="asset-input">Ticker</label>
+                        <input id="asset-input" type="text" placeholder="Enter ticker (e.g., AAPL)" autocomplete="off">
+                        <button type="button" id="add-asset-btn">Add</button>
+                    </div>
+
+                    <!-- Selected Asset List -->
+                    <div class="asset-list">
+                        <h3>Selected Assets</h3>
+                        <ul id="asset-list">
+                            <!-- Dynamically Added -->
+                        </ul>
+                    </div>
+
+                    <!-- Period + Optimise -->
+                    <div class="optimise-selection">
+                        <label for="period-select">Period:</label>
+                        <select id="period-select">
+                            <option value="1d">1 Day</option>
+                            <option value="5d">5 Days</option>
+                            <option value="1mo">1 Month</option>
+                            <option value="6mo">6 Months</option>
+                            <option value="1y" selected>1 Year</option>
+                            <option value="5y">5 Years</option>
+                        </select>
+                        <button id="optimise-btn" type="button">Optimise</button>
+                    </div>
+                </aside>
+                <!-- Results on the right-->
+                <section class="results">
+                    <h2>Results</h2>
+                    <p>Expected Return: <span id="expected-return"></span></p>
+                    <p>Volatility: <span id="volatility"></span></p>
+                    <p>Sharpe Ratio: <span id="sharpe-ratio"></span></p>
+                    <h3>Weights</h3>
+                    <ul id="weights-list">
+                        <!-- Dynamically Added -->
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="script.js" async defer></script>
+</body>
+
+</html>
