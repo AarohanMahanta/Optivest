@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Optivest</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="assets/TabLogo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #343a40; height: 60px;">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="index.html" style="position: relative;">
+                <img src="assets/OptivestLogoWhite.png" alt="Optivest Logo"
+                    style="height:90px; width:auto; margin-top:-15px; margin-bottom:-15px;">
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/AarohanMahanta/Optivest">Github</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- About Content -->
+    <div class="container" style="margin-top: 50px;">
+        <h1 class="text-center">About Optivest</h1>
+        <p class="text-center text-muted mb-5">Modern Portfolio Theory Optimiser</p>
+
+        <div class="main-content justify-content-center">
+            <!-- General Info Card -->
+            <section class="asset-container" style="max-width: 800px;">
+                <h2>What is Optivest?</h2>
+                <p>Optivest is a tool designed to help investors build optimised portfolios using Markowitz's Modern Portfolio Theory (MPT).
+                    You can select assets, define a time period, and calculate expected returns, volatility, and the
+                    Sharpe ratio.</p>
+
+                <h2>Key Features</h2>
+                <ul>
+                    <li>Quickly add or remove asset tickers</li>
+                    <li>Select historical periods for analysis</li>
+                    <li>Optimise portfolios based on expected return and risk</li>
+                    <li>Visualise results in a clean, card-style layout</li>
+                    <li>Export or copy results for further analysis</li>
+                </ul>
+
+                <h2>Purpose</h2>
+                <p>This tool is ideal for investors, students, and anyone interested in data-driven portfolio optimisation.
+                    It simplifies complex calculations and helps make informed investment decisions.</p>
+            </section>
+
+            <!-- Mathematics Card -->
+            <section class="asset-container" style="max-width: 800px;">
+                <h2>Mathematics Behind Optivest</h2>
+                <ul>
+                    <li>
+                        <strong>Portfolio Expected Return:</strong>
+                        <br>
+                        Weighted average of individual asset returns:
+                        <br>
+                        <code>E(Rp) = Σ wi * E(Ri)</code>
+                    </li>
+                    <li>
+                        <strong>Portfolio Volatility (Risk):</strong>
+                        <br>
+                        Accounts for correlations between assets:
+                        <br>
+                        <code>σp = √ΣΣ wi * wj * σi * σj * ρij</code>
+                    </li>
+                    <li>
+                        <strong>Sharpe Ratio (Risk-Adjusted Return):</strong>
+                        <br>
+                        Return per unit of risk:
+                        <br>
+                        <code>Sharpe Ratio = (E(Rp) - Rf) / σp</code>
+                    </li>
+                    <li>
+                        <strong>Optimisation (Modern Portfolio Theory):</strong>
+                        <br>
+                        Maximise return for a given risk or minimise risk for a given return using quadratic programming.
+                    </li>
+                    <li>
+                        <strong>Diversification:</strong>
+                        <br>
+                        Combining low-correlation assets reduces overall portfolio risk and creates an efficient portfolio on the “efficient frontier.”
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
