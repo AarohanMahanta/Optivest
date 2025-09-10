@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: optivest-postgres
+    environment:
+      POSTGRES_USER: optivest_user
+      POSTGRES_PASSWORD: secret123
+      POSTGRES_DB: optivest_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: optivest-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/optivest_db
+      SPRING_DATASOURCE_USERNAME: optivest_user
+      SPRING_DATASOURCE_PASSWORD: secret123
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
