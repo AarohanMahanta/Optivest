@@ -4,6 +4,9 @@ import com.mpt.mpt_optimiser.model.Asset;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AssetDAO extends JpaRepository<Asset, Long> {
+    List<Asset> findByTickerIn(List<String> tickers);
 }

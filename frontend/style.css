@@ -1,0 +1,213 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 600; 
+    font-size: 1.2rem;
+    letter-spacing: 0.5px; 
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Title */
+h1 {
+    font-weight: 700; 
+    font-size: 3rem; 
+    text-align: center;
+    margin-top: 2rem;
+}
+
+p {
+    font-weight: 400;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 0.5rem;
+    color: #6c757d; 
+}
+
+/* Layout */
+.main-content {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    flex-wrap: wrap; /* responsive */
+}
+
+/* Left Panel */
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Asset Section */
+.asset-container {
+    flex: 1;
+    min-width: 280px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.asset-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.asset-container h2 {
+    margin-bottom: 15px;
+    color: #444;
+}
+
+/* Add Asset Form */
+.add-asset-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-asset-form input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+}
+
+.add-asset-form button {
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: 600;
+    border: none;
+    background: #0077cc;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-asset-form button:hover {
+    background: linear-gradient(135deg, #0077cc, #005fa3);
+}
+
+/* Asset List */
+.asset-list ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.asset-list li {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 25px;
+    background-color: #e0e7ff;
+    color: #1e3a8a;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.asset-list li.selected {
+    background-color: #0077cc;
+    color: #fff;
+}
+
+/* Period + Optimise */
+.optimise-selection {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.optimise-selection select {
+    padding: 8px 12px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+}
+
+.optimise-selection button {
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: 600;
+    border: none;
+    background: #28a745;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.optimise-selection button:hover {
+    background: linear-gradient(135deg, #28a745, #1f7d34);
+}
+
+/* Results Section */
+.results {
+    flex: 1;
+    min-width: 280px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.results:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.results h2 {
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.results p {
+    padding: 12px 15px;
+    background: #f4f6fc;
+    border-left: 5px solid #0077cc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.results ul {
+    list-style: none;
+}
+
+.results li {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #eef6ff, #dbeafe);
+    font-weight: 500;
+}
