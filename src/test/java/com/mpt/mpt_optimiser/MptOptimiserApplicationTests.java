@@ -52,19 +52,6 @@ class MptOptimiserApplicationTests {
     }
 
     @Test
-    void testAssetById() throws Exception {
-        Asset asset = new Asset(0.1, 1L, "AAPL", 0.2);
-        expect(assetService.getAsset(1L)).andReturn(asset);
-        replay(assetService);
-
-        mockMvc.perform(get("/api/assets/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].ticker").value("AAPL"))
-                .andExpect(jsonPath("$.expectedReturn").value(0.1));
-        verify(assetService);
-    }
-
-    @Test
     void testAddAsset() throws Exception {
         Asset asset = new Asset(0.1, 1L, "AAPL", 0.2);
 

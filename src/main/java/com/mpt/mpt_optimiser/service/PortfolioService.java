@@ -16,7 +16,7 @@ public class PortfolioService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final AssetDAO assetDAO;
-    private static final String pythonUrl = "http://localhost:5000/optimise";
+    private static final String pythonUrl = "http://optivest-python:5000/optimise";
 
     @Autowired
     public PortfolioService(AssetDAO assetDAO) {
@@ -50,4 +50,15 @@ public class PortfolioService {
 
         return restTemplate.postForObject(pythonUrl, request, PortfolioResult.class);
     }
+
+    //Health Check
+    private boolean isPythonAlive() {
+        try {
+            restTemplate.getForObject("http://optivest-python:5000/health", String.class);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

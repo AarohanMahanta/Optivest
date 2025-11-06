@@ -1,0 +1,17 @@
+[build]
+builder = "docker"
+
+[deploy]
+numReplicas = 1
+
+[[services]]
+name = "optivest-backend"
+buildPath = "."
+
+[[services]]
+name = "optivest-python"
+buildPath = "./python-service"
+
+[[services]]
+name = "optivest-frontend"
+buildPath = "./frontend"

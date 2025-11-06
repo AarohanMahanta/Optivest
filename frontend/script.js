@@ -1,4 +1,3 @@
-// Elements
 const assetInput = document.getElementById("asset-input");
 const addAssetBtn = document.getElementById("add-asset-btn");
 const assetList = document.getElementById("asset-list");
@@ -12,7 +11,7 @@ const weightsList = document.getElementById("weights-list");
 
 let selectedAssets = new Set();
 
-async function loadAssets() {
+async function loadAssets() {//asynchronous to prevent blocking of the rest of the webpage while waiting for backend response.
     try {
         const res = await fetch("http://localhost:8080/api/assets");
         if (!res.ok) throw new Error("Failed to load assets");

@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.ListResourceBundle;
 import java.util.Map;
 
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:5501"})
 @RestController
 @RequestMapping("/api/assets")
-@CrossOrigin(origins = "http://127.0.0.1:5500")
 public class AssetController {
 
     private final AssetService assetService;

@@ -1,39 +1,34 @@
-version: "3.8"
+version: "3.9"
 
 services:
   optivest-backend:
     build: .
-    container_name: optivest-backend
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/optivest
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      SPRING_DATASOURCE_URL: ${DATABASE_URL}
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       - postgres-db
+      - optivest-python
 
   postgres-db:
     image: postgres:14
-    container_name: optivest-postgres
     environment:
-      POSTGRES_DB: optivest
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      POSTGRES_DB: ${PGDATABASE:-optivest}
+      POSTGRES_USER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-postgres}
 
   optivest-frontend:
-    image: nginx:alpine
-    container_name: optivest-frontend
+    build: ./frontend
     ports:
       - "3000:80"
-    volumes:
-      - ./frontend:/user/share/nginx/html:ro
-    depends_on:
-      - optivest-backend
+    environment:
+      REACT_APP_API_URL: https://optivest-backend.up.railway.app
 
-volumes:
-  postgres-data:
+  optivest-python:
+    build: ./python-service
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
