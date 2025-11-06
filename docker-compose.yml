@@ -7,7 +7,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: ${DATABASE_URL}
-      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - postgres-db
       - optivest-python
