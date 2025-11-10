@@ -16,7 +16,7 @@ public class PortfolioService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final AssetDAO assetDAO;
-    private static final String pythonUrl = "http://optivest-python:5000/optimise";
+    private static final String pythonUrl = "https://optivest-python-service-production.up.railway.app";
 
     @Autowired
     public PortfolioService(AssetDAO assetDAO) {
