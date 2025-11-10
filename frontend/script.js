@@ -9,11 +9,12 @@ const volatilityEl = document.getElementById("volatility");
 const sharpeRatioEl = document.getElementById("sharpe-ratio");
 const weightsList = document.getElementById("weights-list");
 
+const API_URL = "https://optivest-backend-production.up.railway.app/api/assets";
 let selectedAssets = new Set();
 
-async function loadAssets() {//asynchronous to prevent blocking of the rest of the webpage while waiting for backend response.
+async function loadAssets() {
     try {
-        const res = await fetch("http://localhost:8080/api/assets");
+        const res = await fetch(`${API_URL}/assets`);
         if (!res.ok) throw new Error("Failed to load assets");
         const assets = await res.json();
 
@@ -44,10 +45,10 @@ addAssetBtn.addEventListener("click", async () => {
     if (!ticker) return;
 
     try {
-        const res = await fetch("http://localhost:8080/api/assets", {
+        const res = await fetch(`${API_URL}/assets`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ticker: ticker })
+            body: JSON.stringify({ ticker })
         });
 
         if (!res.ok) throw new Error("Failed to add asset");
@@ -70,7 +71,7 @@ optimiseBtn.addEventListener("click", async () => {
     };
 
     try {
-        const res = await fetch("http://localhost:8080/api/assets/optimise/chosen", {
+        const res = await fetch(`${API_URL}/assets/optimise/chosen`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
