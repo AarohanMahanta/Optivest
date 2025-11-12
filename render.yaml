@@ -1,0 +1,41 @@
+services:
+  # --- Java backend ---
+  - type: web
+    name: optivest-backend
+    env: docker
+    plan: free
+    rootDir: .
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: optivest-db
+          property: connectionString
+
+  # --- Python microservice ---
+  - type: web
+    name: optivest-python
+    env: docker
+    plan: free
+    rootDir: ./python-service
+    dockerfilePath: ./python-service/Dockerfile
+    envVars:
+      - key: PORT
+        value: 5000
+
+  # --- Frontend (Nginx static site) ---
+  - type: web
+    name: optivest-frontend
+    env: docker
+    plan: free
+    rootDir: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://optivest-backend.onrender.com
+
+databases:
+  - name: optivest-db
+    plan: free
+    databaseName: optivest
+    user: postgres
