@@ -1,35 +1,19 @@
-# -------------------------
-# 1. Base image
-# -------------------------
+# Use lightweight Node image
 FROM node:18-alpine
 
-# -------------------------
-# 2. Set working directory
-# -------------------------
+# Set working directory
 WORKDIR /app
 
-# -------------------------
-# 3. Copy package files (if they exist)
-# -------------------------
+# Copy only the files needed for build first (better caching)
 COPY package*.json ./
+RUN npm install --production
 
-# -------------------------
-# 4. Install dependencies
-# -------------------------
-RUN npm install
-
-# -------------------------
-# 5. Copy the rest of the app
-# -------------------------
+# Copy all static site files
 COPY . .
 
-# -------------------------
-# 6. Expose the Railway port
-# -------------------------
+# Railway will inject its own PORT; default to 3000
 ENV PORT=3000
 EXPOSE 3000
 
-# -------------------------
-# 7. Start the Express server
-# -------------------------
-CMD ["npm", "start"]
+# Start the web server
+CMD ["node", "server.js"]

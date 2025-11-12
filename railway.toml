@@ -1,5 +1,6 @@
 [build]
-builder = "NIXPACKS"
+builder = "docker"
+root = "frontend"
 
-[deploy]
-numReplicas = 1
+[env]
+PORT = "3000"
