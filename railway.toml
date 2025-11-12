@@ -1,6 +1,0 @@
-[build]
-builder = "docker"
-root = "frontend"
-
-[env]
-PORT = "3000"
