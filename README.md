@@ -2,13 +2,13 @@
 
 A full-stack web application that allows users to **add financial assets**, select them, and run **Modern Portfolio Theory (MPT) optimisation** using a **Java + Python backend** with a **lightweight HTML/CSS/JS frontend**. The optimisation calculates **expected returns, volatility, Sharpe ratio, and portfolio weights**.  
 
-## Note
-Due to stricter rate limiting being enforced currently by yfinance, there are issues with the functionality of the optimisation feature. 
-A fix will be deployed soon.
 ## Live Demo
 Check out the live version here:  
 ## [Optivest](https://optivest-static.onrender.com/)
 
+
+## Note [13.11.2025]
+Due to stricter rate limiting being by yfinance, Stooq CSV data downloads via HTTP requests are used for financial data instead.
 ---
 
 ## Features  
