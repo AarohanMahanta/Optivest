@@ -4,7 +4,7 @@ A full-stack web application that allows users to **add financial assets**, sele
 
 ## Live Demo
 Check out the live version here:  
-[Optivest](https://optivest-static.onrender.com/)
+## [Optivest](https://optivest-static.onrender.com/)
 
 ---
 
