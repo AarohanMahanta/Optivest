@@ -3,7 +3,9 @@ import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
 from scipy.optimize import minimize
-import investpy
+import requests
+
+ALPHAVANTAGE_API_KEY = os.getenv("ALPHAVANTAGE_API_KEY", "YOUR_API_KEY_HERE")
 
 class PortfolioOptimiser:
     def __init__(self):
@@ -19,7 +21,6 @@ class PortfolioOptimiser:
 
     @staticmethod
     def clean_json(value):
-        """Recursively replace NaN or Inf with None for JSON safety."""
         if isinstance(value, float) and (np.isnan(value) or np.isinf(value)):
             return None
         if isinstance(value, list):
@@ -30,27 +31,28 @@ class PortfolioOptimiser:
 
     @staticmethod
     def safe_percent(value):
-        """Convert a float to a percentage number, or None if invalid."""
         if value is None or np.isnan(value):
             return None
         return round(value * 100, 2)
 
-    @staticmethod
-    def fetch_prices(tickers, period="1y"):
-        """Fetch stock prices using investpy."""
-        adj_close = pd.DataFrame()
-        for ticker in tickers:
-            try:
-                df = investpy.stocks.get_stock_historical_data(
-                    stock=ticker,
-                    country="united states",
-                    from_date="01/11/2023",
-                    to_date="13/11/2025"
-                )
-                adj_close[ticker] = df["Close"]
-            except Exception as e:
-                print(f"Failed to fetch {ticker}: {e}")
-        return adj_close
+    def fetch_prices(self, ticker):
+        """Fetch adjusted close prices using Alpha Vantage"""
+        url = f"https://www.alphavantage.co/query"
+        params = {
+            "function": "TIME_SERIES_DAILY_ADJUSTED",
+            "symbol": ticker,
+            "outputsize": "full",
+            "apikey": ALPHAVANTAGE_API_KEY
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
+        if "Time Series (Daily)" not in data:
+            return None
+        df = pd.DataFrame(data["Time Series (Daily)"]).T
+        df.index = pd.to_datetime(df.index)
+        df.sort_index(inplace=True)
+        df["Close"] = df["5. adjusted close"].astype(float)
+        return df[["Close"]]
 
     def optimise(self):
         data = request.get_json()
@@ -60,11 +62,20 @@ class PortfolioOptimiser:
         if not tickers:
             return jsonify({"error": "No tickers provided"}), 400
 
-        adj_close = self.fetch_prices(tickers, period)
-        valid_tickers = [t for t in tickers if t in adj_close.columns]
+        adj_close = pd.DataFrame()
+        for ticker in tickers:
+            df = self.fetch_prices(ticker)
+            if df is not None:
+                adj_close[ticker] = df["Close"]
+            else:
+                print(f"Failed to fetch data for {ticker}")
 
+        valid_tickers = [t for t in tickers if t in adj_close.columns]
         if adj_close.empty:
             return jsonify({"error": "No valid ticker data available"}), 400
+
+        # Limit to last 252 trading days (1 year)
+        adj_close = adj_close.tail(252)
 
         daily_returns = adj_close.pct_change().dropna()
         if daily_returns.empty:
