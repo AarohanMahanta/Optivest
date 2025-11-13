@@ -4,18 +4,13 @@ import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
 from scipy.optimize import minimize
-import yfinance as yf
 import finnhub
-
 
 class PortfolioOptimiser:
     def __init__(self):
         self.app = Flask(__name__)
         self.register_routes()
-
-        # Finnhub setup
-        self.finnhub_api_key = os.getenv("FINNHUB_API_KEY")
-        self.finnhub_client = finnhub.Client(api_key=self.finnhub_api_key) if self.finnhub_api_key else None
+        self.finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
 
     def register_routes(self):
         self.app.add_url_rule("/health", "health", self.health)
@@ -42,50 +37,31 @@ class PortfolioOptimiser:
             return None
         return round(value * 100, 2)
 
-    @staticmethod
-    def download_prices_yf(tickers, period, retries=3, delay=5):
-        """Download ticker data from yfinance with retry logic."""
-        for attempt in range(retries):
-            try:
-                data = yf.download(
-                    tickers,
-                    period=period,
-                    group_by="ticker",
-                    auto_adjust=True,
-                    progress=False,
-                )
-                return data
-            except Exception as e:
-                print(f"yfinance attempt {attempt+1} failed: {e}")
-                time.sleep(delay)
-        return pd.DataFrame()
+    def fetch_prices(self, ticker, period="1y"):
+        """Fetch historical OHLC data from Finnhub."""
+        now = int(time.time())
+        period_map = {
+            "1mo": 30 * 24 * 60 * 60,
+            "3mo": 90 * 24 * 60 * 60,
+            "6mo": 180 * 24 * 60 * 60,
+            "1y": 365 * 24 * 60 * 60,
+            "2y": 2 * 365 * 24 * 60 * 60,
+            "5y": 5 * 365 * 24 * 60 * 60
+        }
+        start = now - period_map.get(period, 365 * 24 * 60 * 60)
 
-    def download_prices_finnhub(self, tickers, period):
-        """Download data from Finnhub as fallback."""
-        if not self.finnhub_client:
-            print("Finnhub API key not found, skipping fallback.")
-            return pd.DataFrame()
-
-        days_map = {"1y": 365, "6mo": 180, "3mo": 90, "1mo": 30}
-        days = days_map.get(period, 365)
-        now = int(pd.Timestamp.now().timestamp())
-        frm = int((pd.Timestamp.now() - pd.Timedelta(days=days)).timestamp())
-
-        price_data = {}
-        for t in tickers:
-            try:
-                candles = self.finnhub_client.stock_candles(
-                    symbol=t, resolution="D", _from=frm, to=now
-                )
-                if candles and candles.get("s") == "ok" and "c" in candles:
-                    price_data[t] = pd.Series(candles["c"], dtype=float)
-            except Exception as e:
-                print(f"Finnhub failed for {t}: {e}")
-
-        if not price_data:
-            return pd.DataFrame()
-
-        return pd.DataFrame(price_data)
+        try:
+            res = self.finnhub_client.stock_candles(ticker, 'D', start, now)
+            if res.get("s") != "ok":
+                return None
+            df = pd.DataFrame({
+                "Date": pd.to_datetime(res["t"], unit="s"),
+                "Close": res["c"]
+            }).set_index("Date")
+            return df
+        except Exception as e:
+            print(f"Error fetching {ticker}: {e}")
+            return None
 
     def optimise(self):
         data = request.get_json()
@@ -95,62 +71,45 @@ class PortfolioOptimiser:
         if not tickers:
             return jsonify({"error": "No tickers provided"}), 400
 
-        # Step 1: Try Yahoo Finance
-        prices = self.download_prices_yf(tickers, period)
-        if prices.empty:
-            print("Falling back to Finnhub...")
-            prices = self.download_prices_finnhub(tickers, period)
+        price_data = {}
+        for ticker in tickers:
+            df = self.fetch_prices(ticker, period)
+            if df is not None and not df.empty:
+                price_data[ticker] = df["Close"]
 
-        if prices.empty:
+        if not price_data:
             return jsonify({"error": "No valid ticker data available"}), 400
 
-        # Handle MultiIndex vs single ticker
-        adj_close = pd.DataFrame()
-        valid_tickers = []
-        if isinstance(prices.columns, pd.MultiIndex):
-            for t in tickers:
-                if t in prices:
-                    adj_close[t] = prices[t]["Close"]
-                    valid_tickers.append(t)
-        else:
-            if "Close" in prices.columns:
-                adj_close = prices["Close"].to_frame() if len(tickers) == 1 else prices
-            else:
-                adj_close = prices
-            adj_close = adj_close[[c for c in adj_close.columns if c in tickers]]
-            valid_tickers = list(adj_close.columns)
+        adj_close = pd.DataFrame(price_data)
+        adj_close.dropna(inplace=True)
+        valid_tickers = list(adj_close.columns)
 
         if adj_close.empty:
-            return jsonify({"error": "No valid ticker data available"}), 400
+            return jsonify({"error": "No valid data after cleaning"}), 400
 
-        # Calculate daily returns
         daily_returns = adj_close.pct_change().dropna()
         if daily_returns.empty:
             return jsonify({"error": "Insufficient data to calculate returns"}), 400
 
         mean_returns = daily_returns.mean() * 252
         covariance_matrix = daily_returns.cov() * 252
-
         n = len(valid_tickers)
-        if n == 0:
-            return jsonify({"error": "No valid tickers after processing"}), 400
 
-        # Sharpe ratio optimization
         def negative_sharpe(weights):
             port_return = np.dot(weights, mean_returns)
             port_vol = np.sqrt(np.dot(weights.T, np.dot(covariance_matrix, weights)))
             return -(port_return / port_vol) if port_vol > 0 else 0
 
-        constraints = {"type": "eq", "fun": lambda w: np.sum(w) - 1}
+        constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
         bounds = tuple((0, 1) for _ in range(n))
         initial_guess = np.ones(n) / n
 
         opt_result = minimize(
             negative_sharpe,
             initial_guess,
-            method="SLSQP",
+            method='SLSQP',
             bounds=bounds,
-            constraints=constraints,
+            constraints=constraints
         )
 
         weights = opt_result.x if opt_result.success else initial_guess
@@ -166,13 +125,14 @@ class PortfolioOptimiser:
             "period": period,
             "requestedTickers": tickers,
             "validTickers": valid_tickers,
+            "source": "finnhub"
         }
 
         return jsonify(self.clean_json(result))
 
     def run(self):
         port = int(os.environ.get("PORT", 5000))
-        self.app.run(host="0.0.0.0", port=port, debug=True)
+        self.app.run(host='0.0.0.0', port=port, debug=True)
 
 
 if __name__ == "__main__":
