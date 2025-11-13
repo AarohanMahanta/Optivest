@@ -38,24 +38,24 @@ class PortfolioOptimiser:
 
     def fetch_prices_stooq(self, ticker, period="1y"):
         symbol = ticker.lower()
-    if not symbol.endswith(".us"):
-        symbol = f"{symbol}.us"
-    url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    try:
-        resp = requests.get(url, headers=headers, timeout=10)
-        if resp.status_code != 200:
-            print(f"Failed to fetch {ticker}: HTTP {resp.status_code}")
+        if not symbol.endswith(".us"):
+            symbol = f"{symbol}.us"
+        url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+            if resp.status_code != 200:
+                print(f"Failed to fetch {ticker}: HTTP {resp.status_code}")
+                return None
+            if "Date" not in resp.text:
+                print(f"Invalid CSV for {ticker}")
+                return None
+            df = pd.read_csv(StringIO(resp.text), parse_dates=["Date"]).set_index("Date")
+            df.sort_index(inplace=True)
+            return df[["Close"]]
+        except Exception as e:
+            print(f"Exception fetching {ticker}: {e}")
             return None
-        if "Date" not in resp.text:
-            print(f"Invalid CSV for {ticker}")
-            return None
-        df = pd.read_csv(StringIO(resp.text), parse_dates=["Date"]).set_index("Date")
-        df.sort_index(inplace=True)
-        return df[["Close"]]
-    except Exception as e:
-        print(f"Exception fetching {ticker}: {e}")
-        return None
 
 
     def optimise(self):
