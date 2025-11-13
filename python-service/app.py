@@ -1,16 +1,14 @@
 import os
-import time
 import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
 from scipy.optimize import minimize
-import finnhub
+import investpy
 
 class PortfolioOptimiser:
     def __init__(self):
         self.app = Flask(__name__)
         self.register_routes()
-        self.finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
 
     def register_routes(self):
         self.app.add_url_rule("/health", "health", self.health)
@@ -37,31 +35,22 @@ class PortfolioOptimiser:
             return None
         return round(value * 100, 2)
 
-    def fetch_prices(self, ticker, period="1y"):
-        """Fetch historical OHLC data from Finnhub."""
-        now = int(time.time())
-        period_map = {
-            "1mo": 30 * 24 * 60 * 60,
-            "3mo": 90 * 24 * 60 * 60,
-            "6mo": 180 * 24 * 60 * 60,
-            "1y": 365 * 24 * 60 * 60,
-            "2y": 2 * 365 * 24 * 60 * 60,
-            "5y": 5 * 365 * 24 * 60 * 60
-        }
-        start = now - period_map.get(period, 365 * 24 * 60 * 60)
-
-        try:
-            res = self.finnhub_client.stock_candles(ticker, 'D', start, now)
-            if res.get("s") != "ok":
-                return None
-            df = pd.DataFrame({
-                "Date": pd.to_datetime(res["t"], unit="s"),
-                "Close": res["c"]
-            }).set_index("Date")
-            return df
-        except Exception as e:
-            print(f"Error fetching {ticker}: {e}")
-            return None
+    @staticmethod
+    def fetch_prices(tickers, period="1y"):
+        """Fetch stock prices using investpy."""
+        adj_close = pd.DataFrame()
+        for ticker in tickers:
+            try:
+                df = investpy.stocks.get_stock_historical_data(
+                    stock=ticker,
+                    country="united states",
+                    from_date="01/11/2023",
+                    to_date="13/11/2025"
+                )
+                adj_close[ticker] = df["Close"]
+            except Exception as e:
+                print(f"Failed to fetch {ticker}: {e}")
+        return adj_close
 
     def optimise(self):
         data = request.get_json()
@@ -71,21 +60,11 @@ class PortfolioOptimiser:
         if not tickers:
             return jsonify({"error": "No tickers provided"}), 400
 
-        price_data = {}
-        for ticker in tickers:
-            df = self.fetch_prices(ticker, period)
-            if df is not None and not df.empty:
-                price_data[ticker] = df["Close"]
-
-        if not price_data:
-            return jsonify({"error": "No valid ticker data available"}), 400
-
-        adj_close = pd.DataFrame(price_data)
-        adj_close.dropna(inplace=True)
-        valid_tickers = list(adj_close.columns)
+        adj_close = self.fetch_prices(tickers, period)
+        valid_tickers = [t for t in tickers if t in adj_close.columns]
 
         if adj_close.empty:
-            return jsonify({"error": "No valid data after cleaning"}), 400
+            return jsonify({"error": "No valid ticker data available"}), 400
 
         daily_returns = adj_close.pct_change().dropna()
         if daily_returns.empty:
@@ -93,7 +72,10 @@ class PortfolioOptimiser:
 
         mean_returns = daily_returns.mean() * 252
         covariance_matrix = daily_returns.cov() * 252
+
         n = len(valid_tickers)
+        if n == 0:
+            return jsonify({"error": "No valid tickers after processing"}), 400
 
         def negative_sharpe(weights):
             port_return = np.dot(weights, mean_returns)
@@ -124,15 +106,14 @@ class PortfolioOptimiser:
             "sharpeRatio": round(sharpe_ratio, 2) if sharpe_ratio is not None else None,
             "period": period,
             "requestedTickers": tickers,
-            "validTickers": valid_tickers,
-            "source": "finnhub"
+            "validTickers": valid_tickers
         }
 
         return jsonify(self.clean_json(result))
 
     def run(self):
         port = int(os.environ.get("PORT", 5000))
-        self.app.run(host='0.0.0.0', port=port, debug=True)
+        self.app.run(host="0.0.0.0", port=port, debug=True)
 
 
 if __name__ == "__main__":
