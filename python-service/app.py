@@ -4,6 +4,7 @@ import pandas as pd
 from flask import Flask, request, jsonify
 from scipy.optimize import minimize
 import requests
+from io import StringIO
 
 ALPHAVANTAGE_API_KEY = os.getenv("ALPHAVANTAGE_API_KEY", "YOUR_API_KEY_HERE")
 
@@ -35,23 +36,16 @@ class PortfolioOptimiser:
             return None
         return round(value * 100, 2)
 
-    def fetch_prices(self, ticker):
-        """Fetch adjusted close prices using Alpha Vantage"""
-        url = f"https://www.alphavantage.co/query"
-        params = {
-            "function": "TIME_SERIES_DAILY_ADJUSTED",
-            "symbol": ticker,
-            "outputsize": "full",
-            "apikey": ALPHAVANTAGE_API_KEY
-        }
-        response = requests.get(url, params=params)
-        data = response.json()
-        if "Time Series (Daily)" not in data:
+    def fetch_prices_stooq(self, ticker, period="1y"):
+        symbol = ticker.lower()
+        if not symbol.endswith(".us"):
+            symbol = f"{symbol}.us"
+        url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
+        resp = requests.get(url, timeout=10)
+        if resp.status_code != 200 or "Date" not in resp.text:
             return None
-        df = pd.DataFrame(data["Time Series (Daily)"]).T
-        df.index = pd.to_datetime(df.index)
+        df = pd.read_csv(StringIO(resp.text), parse_dates=["Date"]).set_index("Date")
         df.sort_index(inplace=True)
-        df["Close"] = df["5. adjusted close"].astype(float)
         return df[["Close"]]
 
     def optimise(self):
@@ -64,7 +58,7 @@ class PortfolioOptimiser:
 
         adj_close = pd.DataFrame()
         for ticker in tickers:
-            df = self.fetch_prices(ticker)
+            df = self.fetch_prices_stooq(ticker)
             if df is not None:
                 adj_close[ticker] = df["Close"]
             else:
