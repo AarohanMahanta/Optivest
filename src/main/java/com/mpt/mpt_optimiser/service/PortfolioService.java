@@ -28,6 +28,12 @@ public class PortfolioService {
         return getPortfolioResult(assets, "1y");
     }
 
+    /**
+     * Main optimisation method, receives List of tickers and time period for optimisation from controller.
+     * @param tickers: List of tickers chosen by user for optimisation; e.g. {"AAPL", "PLTR", ...}.
+     * @param period: Time period for optimisation chosen by user; e.g. "1yr".
+     * @return
+     */
     public PortfolioResult optimiseWithChosenAssets(List<String> tickers, String period) {
         List<Asset> assets = assetDAO.findByTickerIn(tickers);
 
@@ -38,7 +44,12 @@ public class PortfolioService {
         return getPortfolioResult(assets, period);
     }
 
-
+    /**
+     * Helper Method used to interact with the python service.
+     * @param assets: List of Asset objects, consisting of assets chosen for optimisation by user.
+     * @param period: Time period for optimisation chosen by user.
+     * @return
+     */
     private PortfolioResult getPortfolioResult(List<Asset> assets, String period) {
         List<String> tickers = assets.stream()
                 .map(Asset::getTicker)
